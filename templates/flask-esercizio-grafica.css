@@ -208,10 +208,10 @@ ul li:hover ul {
 }
 
 .container-imgs {
-    margin-top: 10%;
+    margin-top: 560px;
     margin-right:30%;
     display: flex;
-    flex-wrap: wrap;
+
     gap: 30px;
     justify-content: center;
     align-items: center;
