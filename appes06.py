@@ -75,7 +75,21 @@ def cerca():
     return render_template('plot2.html',
                        PageTitle="Matplotlib")
 
+@app.route('/risultato', methods=("POST", "GET"))
+def mp():
+    global imgUtente
 
+    qrt = request.args['quartiere']
+    imgUtente = quartieri[quartieri['NIL']==qrt]
+
+    return render_template('risultato.html',PageTitle = "Matplotlib",quartiere=qrt)
+
+
+@app.route('/scelta', methods=['GET'])
+def scelte():
+    qrt = quartieri.NIL.to_list()
+    qrt.sort()
+    return render_template('scelta.html',PageTitle = "Matplotlib",quartieri=qrt)
 
 
 if __name__ == '__main__':
