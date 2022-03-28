@@ -23,6 +23,9 @@ quartieri = gpd.read_file(
     '/workspace/Flask/ds964_nil_wm (1)-20220322T111443Z-001.zip')
 
 
+fontanelle = gpd.read_file('/workspace/Flask/Fontanelle-20220328T183849Z-001.zip')
+
+
 @app.route('/', methods=['GET'])
 def home():
     return render_template('homepage.html')
@@ -90,6 +93,49 @@ def scelte():
     qrt = quartieri.NIL.to_list()
     qrt.sort()
     return render_template('scelta.html',PageTitle = "Matplotlib",quartieri=qrt)
+
+
+
+@app.route("/fontanelle", methods=["GET"])
+def fontanelle1():
+    return render_template("fontanelle.html", quartieri= quartieri["NIL"])
+
+
+
+@app.route('/fontanelleres', methods=("POST", "GET"))
+def fontanelleRes():
+    global imgUtente, fontQuart
+    
+    quartiereUtente = request.args["Quartiere"]
+    imgUtente = quartieri[quartieri["NIL"] == quartiereUtente]
+    fontQuart = fontanelle[fontanelle.within(imgUtente.geometry.squeeze())]
+    print(fontQuart)
+    return render_template('fontanelleRes.html', PageTitle = "Matplotlib", quartiere=quartiereUtente, tabella = fontQuart.to_html())
+
+@app.route("/fontanelle.png", methods=["GET"])
+def Fontanelle():
+    fig, ax = plt.subplots(figsize = (12,8))
+
+    imgUtente.to_crs(epsg=3857).plot(ax=ax, alpha=0.5, edgecolor="k")
+    fontQuart.to_crs(epsg=3857).plot(ax=ax, alpha=0.5, edgecolor="k")
+    contextily.add_basemap(ax=ax)   
+
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 if __name__ == '__main__':
