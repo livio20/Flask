@@ -17,9 +17,9 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-comuni = gpd.read_file('/workspace/Flask/Comuni.zip')
-province = gpd.read_file('/workspace/Flask/Provincia.zip')
-regioni = gpd.read_file('/workspace/Flask/Regioni.zip')
+comuni = gpd.read_file('/workspace/Flask/comuni.zip')
+province = gpd.read_file('/workspace/Flask/province.zip')
+regioni = gpd.read_file('/workspace/Flask/regioni.zip')
 
 @app.route("/", methods=["GET"])
 def home():
