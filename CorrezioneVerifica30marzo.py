@@ -13,7 +13,10 @@ app = Flask(__name__)
 
 import pandas as pd
 
-stazioni= pd.read_csv('/workspace/Flask/coordfix_ripetitori_radiofonici_milano_160120_loc_final.csv',sep=';')
+stazioni = pd.read_csv('/workspace/Flask/coordfix_ripetitori_radiofonici_milano_160120_loc_final.csv',sep=';')
+stazionigeo = gpd.read_file('/workspace/Flask/ds710_coordfix_ripetitori_radiofonici_milano_160120_loc_final.geojson')
+quartieri = gpd.read_file('/workspace/Flask/ds964_nil_wm (1)-20220322T111443Z-001.zip')
+
 
 @app.route('/', methods=['GET'])
 def home():
@@ -34,6 +37,7 @@ def numero():
 
 @app.route('/grafico', methods=['GET'])
 def grafico():
+
     fig, ax = plt.subplots(figsize = (6,4))
     x = risultato.MUNICIPIO
     y = risultato.OPERATORE
@@ -41,12 +45,14 @@ def grafico():
     ax.bar(x,y, color='red')
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
+
     return Response(output.getvalue(), mimetype='image/png')
 
 
 
 @app.route('/selezione', methods=['GET'])
 def selezione():
+
     scelta = request.args['Scelta']
     if scelta == 'es1' :
         return redirect(url_for('numero'))
@@ -56,6 +62,53 @@ def selezione():
         return redirect(url_for('dropdown'))
 
 
+@app.route('/input', methods=['GET'])
+def input():
+    return render_template('input.html')
+
+
+@app.route('/ricerca', methods=['GET'])
+def ricerca():
+    global quartiere, stazioni_quartiere
+
+    nome_quartieri = request.args['quartiere']
+    quartiere= quartieri[quartieri.NIL.str.contains(nome_quartieri)]
+    stazioni_quartiere = stazionigeo[stazionigeo.intersects(quartiere.geometry.squeeze())]
+
+    return render_template('elenco1.html', risultato=stazioni_quartiere.to_html())
+
+    
+    
+@app.route('/mappa', methods=['GET'])
+def mappa():
+
+    fig, ax = plt.subplots(figsize=(12, 8))
+
+    stazioni_quartiere.to_crs(epsg=3857).plot(ax=ax,color='k')
+    quartiere.to_crs(epsg=3857).plot(ax=ax, alpha=0.5,)
+    contextily.add_basemap(ax=ax)
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
+
+
+
+@app.route('/dropdown', methods=['GET'])
+def dropdown():
+    nomi_stazioni= stazioni.OPERATORE.to_list()
+    nomi_stazioni= list(set(nomi_stazioni))
+    nomi_stazioni.sort()
+    return render_template('dropdown.html',stazioni=nomi_stazioni)
+
+
+
+@app.route('/sceltastazione', methods=['GET'])
+def sceltastazione():
+    global quartiere1 ,stazione_utente
+    stazione = request.args['stazione']
+    stazione_utente= stazionigeo[stazionigeo.OPERATORE==stazione]
+    quartiere1=quartieri[quartieri.contains(stazione_utente.geometry.squeeze())]
+    return render_template('vistastazione.html', quartiere=quartiere1)
 
 
 
@@ -63,18 +116,17 @@ def selezione():
 
 
 
+@app.route('/mappaquart', methods=['GET'])
+def mappaquart():
 
+    fig, ax = plt.subplots(figsize=(12, 8))
 
-
-
-
-
-
-
-
-
-
-
+    stazione_utente.to_crs(epsg=3857).plot(ax=ax,color='k')
+    quartiere1.to_crs(epsg=3857).plot(ax=ax, alpha=0.5,)
+    contextily.add_basemap(ax=ax)
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
 
 
 
