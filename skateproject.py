@@ -4,11 +4,35 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def scelta():
-    return render_template("home.html")
+    return render_template("choice.html")
+
+
+@app.route('/selezione', methods=['GET'])
+def selezione():
+
+    scelta = request.args['Scelta']
+    if scelta == 'utente':
+        return render_template("utente.html")
+    elif scelta == 'ospite':
+        return render_template("home.html")
+
+
+@app.route('/selezione1', methods=['GET'])
+def selezione1():
+
+    scelta = request.args['Scelta']
+    if scelta == 'login':
+        return render_template("login.html")
+    elif scelta == 'accesso':
+        return render_template("new_account.html")
 
 
 @app.route("/home", methods=["GET"])
 def home():
+    return render_template("home.html")
+
+@app.route("/login1", methods=["GET"])
+def home1():
     return render_template("home.html")
 
 

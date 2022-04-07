@@ -141,7 +141,7 @@ ul {
     margin: 0;
     padding: 15px 4px 17px 0;
     list-style: none;
-    margin-left: calc(100% - 2660px);
+    margin-left: calc(100% - 155%);
 }
 
 ul li {
@@ -165,7 +165,7 @@ ul li a {
 }
 
 ul li:hover {
-    background: #FE0B01;
+    background: #2200e0;
     color: #fff;
 }
 
