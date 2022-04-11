@@ -27,7 +27,7 @@ def selezione1():
         return render_template("new_account.html")
 
 
-@app.route("/home", methods=["GET"])
+@app.route("/home", methods=["POST", "GET"])
 def home():
     return render_template("home.html")
 
@@ -99,6 +99,10 @@ def guida_ruote():
 @app.route("/contatti", methods=["GET"])
 def contatti():
     return render_template("contatti.html")
+
+@app.route("/maps", methods=["GET"])
+def maps():
+    return render_template("maps.html")
 
 
 
