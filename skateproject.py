@@ -23,7 +23,7 @@ def selezione1():
     scelta = request.args['Scelta']
     if scelta == 'login':
         return render_template("login.html")
-    elif scelta == 'accesso':
+    elif scelta == 'new_account':
         return render_template("new_account.html")
 
 
