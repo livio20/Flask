@@ -1,5 +1,18 @@
-from flask import Flask, render_template, request, Response
+import matplotlib.pyplot as plt
+import matplotlib
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+import contextily
+import geopandas as gpd
+import io
+import pandas as pd
+
+
+from flask import Flask, render_template, request, Response , redirect , url_for
 app = Flask(__name__)
+
+
+park1 = pd.read_csv('skatepark_milano_list.csv')
 
 
 @app.route("/", methods=["GET"])
@@ -104,9 +117,29 @@ def contatti():
 def maps():
     return render_template("maps.html")
 
-@app.route("/mas", methods=["GET"])
-def mas():
-    return render_template("mps.html")
+@app.route("/park", methods=["GET"])
+def par():
+      #numero stazioni per ogni municipio
+    global risultato
+    risultato=park1.groupby("Name")["MUNICIPIO"].count().reset_index()
+    return render_template('park.html',risultato=risultato.to_html())
+    
+@app.route('/grafico', methods=['GET'])
+def grafico():
+    #costruzione grafico
+    fig, ax = plt.subplots(figsize = (6,4))
+
+    x = risultato.Name
+    y = risultato.MUNICIPIO
+
+    ax.bar(x, y, color = "#304C89")
+    #visualizzazione grafico
+
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+
+    return Response(output.getvalue(), mimetype='image/png')
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3245, debug=True)
