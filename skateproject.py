@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 
 park1 = pd.read_csv('skatepark_milano_list.csv')
-
+milano = gpd.read_file('ds964_nil_wm-20220322T104009Z-001.zip')
 
 @app.route("/", methods=["GET"])
 def scelta():
@@ -117,28 +117,28 @@ def contatti():
 def maps():
     return render_template("maps.html")
 
-@app.route("/park", methods=["GET"])
-def par():
-      #numero stazioni per ogni municipio
-    global risultato
-    risultato=park1.groupby("Name")["MUNICIPIO"].count().reset_index()
-    return render_template('park.html',risultato=risultato.to_html())
-    
-@app.route('/grafico', methods=['GET'])
-def grafico():
-    #costruzione grafico
-    fig, ax = plt.subplots(figsize = (6,4))
 
-    x = risultato.Name
-    y = risultato.MUNICIPIO
+@app.route("/skatepark", methods=["GET"])
+def park():
+    return render_template("skatepark.html")
 
-    ax.bar(x, y, color = "#304C89")
-    #visualizzazione grafico
 
+@app.route("/skateshop", methods=["GET"])
+def shop():
+    return render_template("skateshop.html")    
+
+@app.route('/park', methods=['GET'])
+def mappa():
+
+    fig, ax = plt.subplots(figsize = (12,8))
+
+    park1.to_crs(epsg=3857).plot(ax=ax, alpha=0.5, color='k')
+    milano.to_crs(epsg=3857).plot(ax=ax, alpha=0.5,edgecolor='k')
+    contextily.add_basemap(ax=ax)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
-
     return Response(output.getvalue(), mimetype='image/png')
+
 
 
 if __name__ == '__main__':
