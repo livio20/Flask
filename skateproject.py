@@ -14,6 +14,8 @@ app = Flask(__name__)
 
 park1 = pd.read_csv('skatepark_milano_list.csv')
 milano = gpd.read_file('ds964_nil_wm-20220322T104009Z-001.zip')
+PARKS1 = gpd.read_file('PARKS.geojson')
+SHOPS1 = gpd.read_file('SHOPS.geojson')
 
 @app.route("/", methods=["GET"])
 def scelta():
@@ -106,7 +108,7 @@ def guida_truck():
 
 @app.route("/guida_ruote", methods=["GET"])
 def guida_ruote():
-    return render_template("guida_ruote.html")
+    return render_template("guida_route.html")
 
 
 @app.route("/contatti", methods=["GET"])
@@ -118,22 +120,16 @@ def maps():
     return render_template("maps.html")
 
 
-@app.route("/skatepark", methods=["GET"])
-def park():
-    return render_template("skatepark.html")
+#MAPPA MAPS#
 
-
-@app.route("/skateshop", methods=["GET"])
-def shop():
-    return render_template("skateshop.html")    
-
-@app.route('/park', methods=['GET'])
+@app.route('/mappa', methods=['GET'])
 def mappa():
 
     fig, ax = plt.subplots(figsize = (12,8))
 
-    park1.to_crs(epsg=3857).plot(ax=ax, alpha=0.5, color='k')
-    milano.to_crs(epsg=3857).plot(ax=ax, alpha=0.5,edgecolor='k')
+    PARKS1.to_crs(epsg=3857).plot(ax=ax, alpha=0.5, color='RED')
+    SHOPS1.to_crs(epsg=3857).plot(ax=ax, alpha=0.5, color='blue')
+    milano.to_crs(epsg=3857).plot(ax=ax, alpha=0.2, edgecolor='k')
     contextily.add_basemap(ax=ax)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
@@ -141,5 +137,93 @@ def mappa():
 
 
 
+
+
+
+#mappe e ricerca skatepark#
+@app.route("/skatepark", methods=["GET"])
+def park():
+    
+    return render_template("skatepark.html",risultato=PARKS1.to_html())
+   
+@app.route('/mappapark', methods=['GET'])
+def mappapark():
+
+    fig, ax = plt.subplots(figsize = (12,8))
+
+    PARKS1.to_crs(epsg=3857).plot(ax=ax, alpha=0.5, color='RED')
+    milano.to_crs(epsg=3857).plot(ax=ax, alpha=0.5, edgecolor='k')
+    contextily.add_basemap(ax=ax)
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
+
+
+@app.route('/ricercapark', methods=['GET'])
+def ricercapark():
+    global quartiere,park_quartiere
+    nome_park=request.args["park3"]
+    quartiere=milano[milano.NIL.str.contains(nome_park.upper())]
+    park_quartiere=PARKS1[PARKS1.within(quartiere.geometry.squeeze())]
+    
+    return render_template("skatepark_risultato.html",risultatopark2=park_quartiere.to_html())
+
+@app.route('/mappapark1', methods=['GET'])
+def mappapark1():
+
+    fig, ax = plt.subplots(figsize = (10,10))
+
+    park_quartiere.to_crs(epsg=3857).plot(ax=ax, alpha=0.5, color='RED')
+    quartiere.to_crs(epsg=3857).plot(ax=ax, alpha=0.5, edgecolor='k')
+    contextily.add_basemap(ax=ax)
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
+
+
+#mappe e ricerca skateshop#
+@app.route("/skateshop", methods=["GET"])
+def shop():
+    return render_template("skateshop.html",risultatoshop=SHOPS1.to_html())   
+
+@app.route('/mappashop', methods=['GET'])
+def mappashop():
+
+    fig, ax = plt.subplots(figsize = (12,8))
+
+    SHOPS1.to_crs(epsg=3857).plot(ax=ax, alpha=0.5, color='RED')
+    milano.to_crs(epsg=3857).plot(ax=ax, alpha=0.5, edgecolor='k')
+    contextily.add_basemap(ax=ax)
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
+
+@app.route('/ricercashop', methods=['GET'])
+def ricercashop():
+    global quartiere,shop_quartiere
+    nome_shop=request.args["shop3"]
+    quartiere=milano[milano.NIL.str.contains(nome_shop.upper())]
+    shop_quartiere=SHOPS1[SHOPS1.within(quartiere.geometry.squeeze())]
+    
+    return render_template("skateshop_risultato.html",risultatoshop2=shop_quartiere.to_html())
+
+@app.route('/mappashop1', methods=['GET'])
+def mappashop1():
+
+    fig, ax = plt.subplots(figsize = (10,10))
+
+    shop_quartiere.to_crs(epsg=3857).plot(ax=ax, alpha=0.5, color='RED')
+    quartiere.to_crs(epsg=3857).plot(ax=ax, alpha=0.5, edgecolor='k')
+    contextily.add_basemap(ax=ax)
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
+
+
+
+
+
+
+#fine#
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3245, debug=True)

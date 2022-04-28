@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="it">
-
+    
 <head>
     <meta charset="utf-8">
-    <title>SkateShop</title>
-    <link href="static/css08-11(2022).css" rel="stylesheet">
+    <title>Skatepark</title>
+    <link href="static/css08-11 (2021).css" rel="stylesheet">
 </head>
  
 <body>
@@ -15,14 +15,21 @@
     <nav>
         <ul>
             <li><a href="/home">Home</a></li>
-            <li><a href="/skatepark">skatepark</a></li>
-      
+        
+            <li> <a href="/skatepark">skatepark</a>
         </ul>
 
     </nav>
     <div class="content">
         <section>
             <article>
+                <form action="/ricercashop">
+                    <input type="text" value="Inserisci lo shop da cercare" name='shop3'></input>
+                    <input type="submit" value="cerca"></input>
+                </form>
+                <img src="/mappashop">
+                {{risultatoshop|safe}}
+                
             </article>
         </section>
     </div>

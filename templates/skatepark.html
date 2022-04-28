@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="it">
-
+    
 <head>
     <meta charset="utf-8">
     <title>Skatepark</title>
-    <link href="static/css08-11(2022).css" rel="stylesheet">
+    <link href="static/css08-11 (2021).css" rel="stylesheet">
 </head>
  
 <body>
@@ -23,6 +23,13 @@
     <div class="content">
         <section>
             <article>
+                <form action="/ricercapark">
+                    <input type="text" value="Inserisci il park da cercare" name='park3'></input>
+                    <input type="submit" value="cerca"></input>
+                </form>
+                <img src="/mappapark">
+                {{risultato|safe}}
+                
             </article>
         </section>
     </div>
