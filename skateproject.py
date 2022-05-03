@@ -7,6 +7,8 @@ import geopandas as gpd
 import io
 import pandas as pd
 
+from UserData import UserData
+d = UserData("/workspace/Flask/static/data.csv")
 
 from flask import Flask, render_template, request, Response , redirect , url_for
 app = Flask(__name__)
@@ -41,6 +43,14 @@ def selezione1():
     elif scelta == 'new_account':
         return render_template("new_account.html")
 
+@app.route('/register', methods=['POST'])
+def register():
+    print(request.form.get('email'))
+    if d.contains(request.form.get('email')):
+        return 'Questo account esiste già'
+    else:
+        d.adduser( email=request.form.get('email'), psw=request.form.get('psw'))
+        return redirect(url_for('home'))
 
 @app.route("/home", methods=["POST", "GET"])
 def home():
