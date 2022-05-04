@@ -7,8 +7,7 @@ import geopandas as gpd
 import io
 import pandas as pd
 
-from UserData import UserData
-d = UserData("/workspace/Flask/static/data.csv")
+
 
 from flask import Flask, render_template, request, Response , redirect , url_for
 app = Flask(__name__)
@@ -43,14 +42,164 @@ def selezione1():
     elif scelta == 'new_account':
         return render_template("new_account.html")
 
-@app.route('/register', methods=['POST'])
-def register():
-    print(request.form.get('email'))
-    if d.contains(request.form.get('email')):
-        return 'Questo account esiste già'
-    else:
-        d.adduser( email=request.form.get('email'), psw=request.form.get('psw'))
-        return redirect(url_for('home'))
+
+
+
+
+
+##login registrazione##
+
+
+
+
+@app.route('/inserisci', methods=['GET'])
+def inserisci():
+    return render_template('new_account.html')
+
+@app.route('/dati', methods=['GET'])
+def dati():
+    
+    
+    email = request.args['email']
+    psw = request.args['psw']
+    pswrepeat = request.args['psw-repeat']
+    
+    
+    df1 = pd.read_csv('database.csv')
+    
+    
+    nuovi_dati = {'email':email,'psw':psw,'psw-repeat':pswrepeat}
+    
+    df1 = df1.append(nuovi_dati,ignore_index=True)
+    
+    
+    df1.to_csv('database.csv', index=False)
+    rdf1 = df1.to_html()
+    #return df1.to_html()
+    return render_template('indexs2.html', tables=[rdf1], titles=[''])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route("/home", methods=["POST", "GET"])
 def home():
