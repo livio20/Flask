@@ -84,7 +84,50 @@ def dati():
 
 
 
+@app.route('/login', methods=['GET'])
+def login():
+    email = request.args['email']
+    psw = request.args['psw']
+    
+    if user["email"] == request.args["email"]:
+            if user["psw"] == request.args['psw']:
+                
+                return render_template('welcome2.html', email=email,psw=psw)
+        #return render_template('error.html')
+    return render_template('error.html', err='utente non registrato')
+   # return render_template('login.html', utenti = utenti)
 
+@app.route('/data1', methods=['GET'])
+def data():
+    
+    email = request.args['email']
+    psw = request.args['psw']
+    confirm = request.args['psw-repeat']
+
+    
+    df1 = pd.read_csv('database.csv')
+    
+    
+    nuovi_dati = {'email':email,'psw':psw,'psw-repeat':psw-repeat}
+    
+    df1 = df1.append(nuovi_dati,ignore_index=True)
+    
+    
+    df1.to_csv('database.csv', index=False)
+    rdf1 = df1.to_html()
+    
+    if psw == confirm:
+            if email:
+                if psw:
+                    if confirm:
+                        if email:
+                            utenti.append({"email": email, "psw": psw, "confirm": confirm})
+                            print(utenti)
+                            #return redirect(url_for("/login"))
+                            return render_template('login.html', utenti=utenti , tables=[rdf1], titles=[''])
+    
+
+    return render_template('error.html', nome = email, err='errore generico')
 
 
 
