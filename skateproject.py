@@ -12,7 +12,7 @@ import pandas as pd
 from flask import Flask, render_template, request, Response , redirect , url_for
 app = Flask(__name__)
 
-
+dati = pd.read_csv("/workspace/Flask/database.csv")
 park1 = pd.read_csv('skatepark_milano_list.csv')
 milano = gpd.read_file('ds964_nil_wm-20220322T104009Z-001.zip')
 PARKS1 = gpd.read_file('PARKS.geojson')
@@ -43,203 +43,58 @@ def selezione1():
         return render_template("new_account.html")
 
 
-
-
-
-
-##login registrazione##
-
-
-
-
-@app.route('/inserisci', methods=['GET'])
-def inserisci():
-    return render_template('new_account.html')
-
-@app.route('/dati', methods=['GET'])
-def dati():
+##registrazione##
+@app.route('/register', methods=['GET', 'POST'])
+def register():
     
-    
-    email = request.args['email']
-    psw = request.args['psw']
-    pswrepeat = request.args['psw-repeat']
-    
-    
-    df1 = pd.read_csv('database.csv')
-    
-    
-    nuovi_dati = {'email':email,'psw':psw,'psw-repeat':pswrepeat}
-    
-    df1 = df1.append(nuovi_dati,ignore_index=True)
-    
-    
-    df1.to_csv('database.csv', index=False)
-    rdf1 = df1.to_html()
-    #return df1.to_html()
-    return render_template('indexs2.html', tables=[rdf1], titles=[''])
+
+    global utente
+
+    if request.method == 'GET':
+        return render_template('register.html')
+    else:
+        psw = request.form.get("psw")
+        cpas = request.form.get("psw-repeat")
+        email = request.form.get("email")
+        
+        
+        utente = [{"psw": psw,"email":email}]
+
+       
+
+
+        #controllo password
+        if cpas!= psw:
+            return 'le password non corrispondono'
+        else:
+            dati_append = dati.append(utente,ignore_index=True)
+            dati_append.to_csv('/workspace/Flask/database.csv',index=False)
+            return render_template('login.html',  psw = psw ,utente = utente, email = email)
 
 
 
 
 
+##login##
 
-
-@app.route('/login', methods=['GET'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    email = request.args['email']
-    psw = request.args['psw']
-    
-    if user["email"] == request.args["email"]:
-            if user["psw"] == request.args['psw']:
-                
-                return render_template('welcome2.html', email=email,psw=psw)
-        #return render_template('error.html')
-    return render_template('error.html', err='utente non registrato')
-   # return render_template('login.html', utenti = utenti)
 
-@app.route('/data1', methods=['GET'])
-def data():
-    
-    email = request.args['email']
-    psw = request.args['psw']
-    confirm = request.args['psw-repeat']
-
-    
-    df1 = pd.read_csv('database.csv')
-    
-    
-    nuovi_dati = {'email':email,'psw':psw,'psw-repeat':psw-repeat}
-    
-    df1 = df1.append(nuovi_dati,ignore_index=True)
-    
-    
-    df1.to_csv('database.csv', index=False)
-    rdf1 = df1.to_html()
-    
-    if psw == confirm:
-            if email:
-                if psw:
-                    if confirm:
-                        if email:
-                            utenti.append({"email": email, "psw": psw, "confirm": confirm})
-                            print(utenti)
-                            #return redirect(url_for("/login"))
-                            return render_template('login.html', utenti=utenti , tables=[rdf1], titles=[''])
-    
-
-    return render_template('error.html', nome = email, err='errore generico')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    #dichiarazione di df. legge il file json creato per preservare i dati degli utenti
+        #login sistemato---
+        # ciclo for di controllo alternativo
+        if request.method == 'GET':
+            return render_template('home.html')
+        elif request.method == 'POST':
+            pas = request.form.get("psw")
+            email = request.form.get("email")
+            print(psw, email)
+
+        for _, r in dati.iterrows():
+            if email == r['email'] and psw == r['psw']:  
+                return '<h1>login effettuato </h1>'
+
+        return '<h1>Errore</h1>'
 
 
 
